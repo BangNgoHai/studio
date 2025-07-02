@@ -11,19 +11,23 @@ import { Label } from '@/components/ui/label';
 import { Hand, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type Player = {
-  id: number;
+// Player type for internal use in this component
+type TacticPlayer = {
+  id: string; // Using string to allow unique IDs for home and opponent players
   name: string;
-  avatar: string;
-  initialX: number;
-  initialY: number;
+  avatar?: string;
+  x: number;
+  y: number;
+  team: 'home' | 'opponent';
 };
 
+// Props for the individual player component
 type DraggablePlayerProps = {
-  player: Player & { x: number; y: number };
+  player: TacticPlayer;
   mode: 'drag' | 'draw';
 };
 
+// Draggable player component with team-specific styling
 function DraggablePlayer({ player, mode }: DraggablePlayerProps) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: player.id,
@@ -36,6 +40,8 @@ function DraggablePlayer({ player, mode }: DraggablePlayerProps) {
     transform: CSS.Translate.toString(transform),
   };
 
+  const teamColor = player.team === 'home' ? 'border-primary' : 'border-destructive';
+
   return (
     <div
       ref={setNodeRef}
@@ -47,25 +53,63 @@ function DraggablePlayer({ player, mode }: DraggablePlayerProps) {
         mode === 'draw' && 'cursor-not-allowed'
       )}
     >
-      <Avatar className="w-12 h-12 border-2 border-primary bg-background shadow-lg group-active:scale-110 transition-transform">
+      <Avatar className={cn("w-12 h-12 border-2 bg-background shadow-lg group-active:scale-110 transition-transform", teamColor)}>
         <AvatarImage src={player.avatar} alt={player.name} data-ai-hint="player portrait" />
-        <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
+        <AvatarFallback>{player.team === 'home' ? player.name.charAt(0) : 'O'}</AvatarFallback>
       </Avatar>
-      <span className="mt-1 px-2 py-0.5 text-xs font-semibold bg-background/80 text-foreground rounded-full shadow">
-        {player.name.split(' ')[0]}
-      </span>
+      {player.team === 'home' && (
+        <span className="mt-1 px-2 py-0.5 text-xs font-semibold bg-background/80 text-foreground rounded-full shadow">
+          {player.name.split(' ')[0]}
+        </span>
+      )}
     </div>
   );
 }
 
-type TacticBoardProps = {
-  players: Player[];
+// Type for the props coming from the parent component
+type HomePlayer = {
+  id: number;
+  name: string;
+  avatar: string;
+  initialX: number;
+  initialY: number;
 };
 
+type TacticBoardProps = {
+  players: HomePlayer[];
+};
+
+// The main TacticBoard component
 export function TacticBoard({ players: initialPlayers }: TacticBoardProps) {
-  const [players, setPlayers] = useState(
-    initialPlayers.map(p => ({ ...p, x: p.initialX, y: p.initialY }))
-  );
+  const opponentPositions = [
+    { x: 100 - 8, y: 50 },  // GK
+    { x: 100 - 25, y: 30 }, // DEF
+    { x: 100 - 25, y: 70 }, // DEF
+    { x: 100 - 45, y: 50 }, // MID
+    { x: 100 - 65, y: 30 }, // MID
+    { x: 100 - 65, y: 70 }, // MID
+    { x: 100 - 85, y: 40 }, // FWD
+    { x: 100 - 85, y: 60 }, // FWD
+  ];
+
+  const initialTacticPlayers: TacticPlayer[] = [
+    ...initialPlayers.map(p => ({
+        ...p,
+        id: `home-${p.id}`,
+        team: 'home' as const,
+        x: p.initialX,
+        y: p.initialY,
+    })),
+    ...Array.from({ length: 8 }).map((_, i) => ({
+        id: `opp-${i}`,
+        name: `Opponent ${i + 1}`,
+        x: opponentPositions[i]?.x ?? 50,
+        y: opponentPositions[i]?.y ?? 50,
+        team: 'opponent' as const,
+    }))
+  ];
+
+  const [players, setPlayers] = useState(initialTacticPlayers);
   const [mode, setMode] = useState<'drag' | 'draw'>('drag');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -87,7 +131,6 @@ export function TacticBoard({ players: initialPlayers }: TacticBoardProps) {
         }
     }
     
-    // Resize observer is better than window resize for element-specific resizing
     const resizeObserver = new ResizeObserver(() => resizeCanvas());
     resizeObserver.observe(boardRef.current);
 
