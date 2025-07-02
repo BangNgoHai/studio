@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Users, Vote, LogOut } from 'lucide-react';
+import { Home, Users, Vote, LogOut, Swords, ClipboardList } from 'lucide-react';
 import {
   SidebarContent,
   SidebarFooter,
@@ -30,7 +30,7 @@ export const FootballIcon = () => (
 export function MainSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const isActive = (path: string) => pathname === path || (path === '/players' && pathname.startsWith('/players/'));
+  const isActive = (path: string) => pathname.startsWith(path) && (path !== '/' || pathname === '/');
   const user = getCurrentUser();
 
   return (
@@ -64,6 +64,30 @@ export function MainSidebar() {
               <Link href="/players">
                 <Users />
                 Player Profiles
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive('/teams')}
+              tooltip={{ children: 'Squads' }}
+            >
+              <Link href="/teams">
+                <Swords />
+                Squads
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive('/strategy')}
+              tooltip={{ children: 'Strategy' }}
+            >
+              <Link href="/strategy">
+                <ClipboardList />
+                Strategy Board
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
