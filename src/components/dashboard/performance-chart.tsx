@@ -1,9 +1,28 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { performanceData } from "@/lib/data";
-import { ChartTooltipContent } from "@/components/ui/chart";
+import { 
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  type ChartConfig
+} from "@/components/ui/chart";
+
+const chartConfig = {
+  pointsFor: {
+    label: "Points For",
+    color: "hsl(var(--primary))",
+  },
+  pointsAgainst: {
+    label: "Points Against",
+    color: "hsl(var(--accent))",
+  },
+} satisfies ChartConfig;
+
 
 export function PerformanceChart() {
   return (
@@ -13,22 +32,20 @@ export function PerformanceChart() {
         <CardDescription>Points scored vs. points conceded over the last 7 games.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={performanceData}>
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+            <BarChart accessibilityLayer data={performanceData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.5)" />
               <XAxis dataKey="game" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-              <Tooltip
+              <ChartTooltip
                 cursor={{ fill: 'hsl(var(--accent) / 0.1)' }}
                 content={<ChartTooltipContent />}
               />
-              <Legend iconSize={10} />
-              <Bar dataKey="pointsFor" name="Points For" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="pointsAgainst" name="Points Against" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey="pointsFor" fill="var(--color-pointsFor)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="pointsAgainst" fill="var(--color-pointsAgainst)" radius={[4, 4, 0, 0]} />
             </BarChart>
-          </ResponsiveContainer>
-        </div>
+        </ChartContainer>
       </CardContent>
     </Card>
   );
