@@ -4,10 +4,10 @@ import { Trophy, ShieldAlert, ArrowDown, ArrowUp } from "lucide-react";
 
 export function TeamStats() {
   const stats = [
-    { title: "Wins", value: teamStats.wins, icon: <Trophy className="text-green-500" /> },
-    { title: "Losses", value: teamStats.losses, icon: <ShieldAlert className="text-red-500" /> },
-    { title: "Points Scored", value: teamStats.pointsScored, icon: <ArrowUp className="text-blue-500" /> },
-    { title: "Points Conceded", value: teamStats.pointsConceded, icon: <ArrowDown className="text-orange-500" /> },
+    { title: "Wins", value: teamStats.wins, icon: <Trophy className="text-primary" /> },
+    { title: "Losses", value: teamStats.losses, icon: <ShieldAlert className="text-destructive" /> },
+    { title: "Points Scored", value: teamStats.pointsScored, icon: <ArrowUp className="text-accent" /> },
+    { title: "Points Conceded", value: teamStats.pointsConceded, icon: <ArrowDown className="text-muted" /> },
   ];
 
   return (
