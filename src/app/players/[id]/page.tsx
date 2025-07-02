@@ -15,7 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Edit } from "lucide-react";
+import { getCurrentUser } from "@/lib/auth";
 
 type PlayerPageProps = {
   params: {
@@ -25,6 +26,7 @@ type PlayerPageProps = {
 
 export default function PlayerPage({ params }: PlayerPageProps) {
   const player = players.find((p) => p.id.toString() === params.id);
+  const currentUser = getCurrentUser();
 
   if (!player) {
     notFound();
@@ -36,33 +38,53 @@ export default function PlayerPage({ params }: PlayerPageProps) {
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Header title="Player Profile" />
-        <Button asChild variant="outline">
-            <Link href="/players">
-                <ArrowLeft />
-                Back to Players
-            </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+            {currentUser.role === 'manager' && (
+                <Button asChild>
+                    <Link href={`/players/${params.id}/edit`}>
+                        <Edit />
+                        Edit Profile
+                    </Link>
+                </Button>
+            )}
+            <Button asChild variant="outline">
+                <Link href="/players">
+                    <ArrowLeft />
+                    Back to Players
+                </Link>
+            </Button>
+        </div>
       </div>
       <main className="space-y-8">
-        <Card>
-          <CardContent className="flex flex-col items-center gap-6 p-6 md:flex-row">
-            <Image
-              src={player.avatar.replace('40x40', '128x128')}
-              alt={player.name}
-              width={128}
-              height={128}
-              className="rounded-full border-4 border-primary shadow-lg"
-              data-ai-hint="player portrait"
-            />
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-4xl font-bold font-headline text-primary">
-                {player.name}
-              </h1>
-              <Badge variant="default" className="mt-2 text-lg">
-                {player.position}
-              </Badge>
+        <Card className="overflow-hidden">
+            <div className="relative h-48 w-full">
+                <Image
+                    src="https://placehold.co/1200x480.png"
+                    alt={`${player.name} action shot`}
+                    fill
+                    className="object-cover"
+                    data-ai-hint="football action"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20" />
             </div>
-          </CardContent>
+            <CardContent className="relative -mt-20 flex flex-col items-center gap-4 p-6 text-center md:flex-row md:text-left">
+                <Image
+                    src={player.avatar.replace('40x40', '128x128')}
+                    alt={player.name}
+                    width={128}
+                    height={128}
+                    className="rounded-full border-4 border-background bg-background shadow-lg"
+                    data-ai-hint="player portrait"
+                />
+                <div className="flex-1">
+                    <h1 className="text-4xl font-bold font-headline text-white">
+                        {player.name}
+                    </h1>
+                    <Badge variant="secondary" className="mt-2 text-base">
+                        {player.position}
+                    </Badge>
+                </div>
+            </CardContent>
         </Card>
 
         <PlayerDetails name={player.name} position={player.position} />
@@ -76,7 +98,7 @@ export default function PlayerPage({ params }: PlayerPageProps) {
               <TableHeader>
                 <TableRow>
                   {statKeys.map((key) => (
-                    <TableHead key={key}>{key}</TableHead>
+                    <TableHead key={key} className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>

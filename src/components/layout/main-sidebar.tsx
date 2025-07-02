@@ -16,6 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '../ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { getCurrentUser } from '@/lib/auth';
 
 export const FootballIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-football">
@@ -29,7 +30,8 @@ export const FootballIcon = () => (
 export function MainSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname === path || (path === '/players' && pathname.startsWith('/players/'));
+  const user = getCurrentUser();
 
   return (
     <>
@@ -88,12 +90,12 @@ export function MainSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" className="h-auto py-2 w-full">
                   <Avatar className="size-8">
-                    <AvatarImage src="https://placehold.co/40x40.png" alt="User" />
-                    <AvatarFallback>TC</AvatarFallback>
+                    <AvatarImage src="https://placehold.co/40x40.png" alt={user.name} data-ai-hint="user portrait" />
+                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start overflow-hidden">
-                    <span className="font-semibold truncate">Team Captain</span>
-                    <span className="text-xs text-muted-foreground truncate">captain@gridiron.com</span>
+                    <span className="font-semibold truncate">{user.name}</span>
+                    <span className="text-xs text-muted-foreground truncate">{user.email}</span>
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

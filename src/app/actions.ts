@@ -22,3 +22,16 @@ export async function handleGeneratePlayerDetails(input: GeneratePlayerDetailsIn
       return { error: error.message || "An unknown error occurred." };
     }
 }
+
+export type UpdatePlayerProfileInput = {
+    playerId: number;
+    name: string;
+    position: string;
+}
+
+export async function handleUpdatePlayerProfile(input: UpdatePlayerProfileInput) {
+    console.log("Simulating player profile update:", input);
+    // In a real application, you would update your database here.
+    // For this prototype, we'll just log the data and return success.
+    return { success: true };
+}
