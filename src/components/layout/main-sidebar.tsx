@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { BarChart2, ClipboardList, Home, Shield, Users, Vote } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Home, Users, Vote, LogOut } from 'lucide-react';
 import {
   SidebarContent,
   SidebarFooter,
@@ -15,8 +15,9 @@ import {
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '../ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-const FootballIcon = () => (
+export const FootballIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-football">
       <path d="M12.43 12.43 18.5 6.36c.86-.86.73-2.28-.3-3.3s-2.44-.86-3.3.3L8.57 9.71"/>
       <path d="m5.5 18.5 6.07-6.07"/>
@@ -27,6 +28,7 @@ const FootballIcon = () => (
 
 export function MainSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const isActive = (path: string) => pathname === path;
 
   return (
@@ -82,16 +84,26 @@ export function MainSidebar() {
         <SidebarSeparator />
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" className="h-auto py-2">
-              <Avatar className="size-8">
-                <AvatarImage src="https://placehold.co/40x40.png" alt="User" />
-                <AvatarFallback>TC</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col items-start">
-                <span className="font-semibold">Team Captain</span>
-                <span className="text-xs text-muted-foreground">captain@gridiron.com</span>
-              </div>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton size="lg" className="h-auto py-2 w-full">
+                  <Avatar className="size-8">
+                    <AvatarImage src="https://placehold.co/40x40.png" alt="User" />
+                    <AvatarFallback>TC</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col items-start overflow-hidden">
+                    <span className="font-semibold truncate">Team Captain</span>
+                    <span className="text-xs text-muted-foreground truncate">captain@gridiron.com</span>
+                  </div>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start" className="w-[calc(var(--sidebar-width)_-_1rem)] mb-2 ml-2">
+                <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

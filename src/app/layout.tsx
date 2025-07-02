@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { AppLayout } from "@/components/layout/app-layout";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
+import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <SidebarProvider>
-          <AppLayout>{children}</AppLayout>
+          <ConditionalLayout>{children}</ConditionalLayout>
         </SidebarProvider>
         <Toaster />
       </body>
