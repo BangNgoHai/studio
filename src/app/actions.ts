@@ -35,3 +35,15 @@ export async function handleUpdatePlayerProfile(input: UpdatePlayerProfileInput)
     // For this prototype, we'll just log the data and return success.
     return { success: true };
 }
+
+export type CreatePlayerProfileInput = {
+    name: string;
+    position: string;
+}
+
+export async function handleCreatePlayerProfile(input: CreatePlayerProfileInput) {
+    console.log("Simulating player profile creation:", input);
+    // In a real application, you would create a new player in your database here.
+    // For this prototype, we'll just log the data and return success.
+    return { success: true };
+}
