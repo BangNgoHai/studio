@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentUser } from '@/lib/auth';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { TacticBoard } from './tactic-board';
+import { Map } from 'lucide-react';
 
 type Player = {
   id: number;
@@ -51,6 +54,20 @@ export function StrategyBoard({ topics, players }: StrategyBoardProps) {
         });
         setNewComments(prev => ({ ...prev, [topicId]: "" }));
     }
+
+    const formationPlayers = players.slice(0, 8).map((p, index) => {
+        const positions = [
+            { x: 8, y: 50 },   // GK
+            { x: 25, y: 30 },  // DEF
+            { x: 25, y: 70 },  // DEF
+            { x: 45, y: 50 },  // MID
+            { x: 65, y: 30 },  // MID
+            { x: 65, y: 70 },  // MID
+            { x: 85, y: 40 },  // FWD
+            { x: 85, y: 60 },  // FWD
+        ];
+        return { ...p, initialX: positions[index]?.x ?? 50, initialY: positions[index]?.y ?? 50 };
+    });
   
     return (
         <Accordion type="single" collapsible className="w-full">
@@ -66,8 +83,27 @@ export function StrategyBoard({ topics, players }: StrategyBoardProps) {
                                 </p>}
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent className="p-6 pt-4">
-                            <p className="mb-6">{topic.description}</p>
+                        <AccordionContent className="p-6 pt-0">
+                             <div className="border-b pb-6 mb-6">
+                                <p className="mb-4">{topic.description}</p>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline">
+                                            <Map className="mr-2 h-4 w-4" />
+                                            View Tactic Board
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-4xl">
+                                        <DialogHeader>
+                                            <DialogTitle className="font-headline">{topic.title}</DialogTitle>
+                                            <DialogDescription>
+                                                Drag players to adjust positions and draw on the board to illustrate tactics.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <TacticBoard players={formationPlayers} />
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
                             
                             <h4 className="font-semibold mb-4 text-base">Discussion</h4>
                             <div className="space-y-6 mb-6">
