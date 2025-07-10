@@ -39,6 +39,17 @@ export const polls = [
   },
   {
     id: 2,
+    question: "When is the best day for our next match: Saturday 12/7/2025?",
+    options: [
+        { id: 'time1', text: 'Morning (9AM)' },
+        { id: 'time2', text: 'Afternoon (2PM)' },
+        { id: 'time3', text: 'Evening (6PM)' },
+    ],
+    votes: {},
+    isActive: true,
+  },
+  {
+    id: 3,
     question: "New jersey design for next season?",
     options: [
       { id: 'optA', text: 'Classic Stripes' },
