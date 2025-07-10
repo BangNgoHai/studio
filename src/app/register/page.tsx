@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import React from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +25,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { FootballIcon } from '@/components/layout/main-sidebar';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { handleRegister } from '@/app/actions';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -34,6 +37,9 @@ const formSchema = z.object({
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,10 +49,25 @@ export default function RegisterPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Simulate successful registration
-    console.log('Register values:', values);
-    router.push('/');
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      const result = await handleRegister(values);
+      if (result.success) {
+        toast({ title: 'Success!', description: 'Your account has been created.' });
+        router.push('/');
+      } else {
+        throw new Error('Registration failed. Please try again.');
+      }
+    } catch (error: any) {
+       toast({
+        variant: 'destructive',
+        title: 'Registration Failed',
+        description: error.message || 'An unexpected error occurred.',
+      });
+    } finally {
+        setIsSubmitting(false);
+    }
   }
 
   return (
@@ -70,7 +91,7 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Leo Martinez" {...field} />
+                    <Input placeholder="Leo Martinez" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -83,7 +104,7 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="leo.martinez@gridiron.com" {...field} />
+                    <Input placeholder="leo.martinez@gridiron.com" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -96,14 +117,23 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              <UserPlus className="mr-2 h-4 w-4" /> Create Account
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+               {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="mr-2 h-4 w-4" /> Create Account
+                </>
+              )}
             </Button>
           </form>
         </Form>
