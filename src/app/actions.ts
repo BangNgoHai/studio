@@ -2,6 +2,8 @@
 
 import { suggestImprovements, SuggestImprovementsInput } from "@/ai/flows/suggest-improvements";
 import { generatePlayerDetails, GeneratePlayerDetailsInput } from "@/ai/flows/generate-player-details";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 export async function handleSuggestImprovements(input: SuggestImprovementsInput) {
   try {
@@ -51,27 +53,24 @@ export async function handleCreatePlayerProfile(input: CreatePlayerProfileInput)
     return { success: true, message: 'Player created successfully.', newPlayerId };
 }
 
-// Simulated User type for auth actions
-type User = {
-    id: string;
-    email: string | null;
-    name: string | null;
-}
-
-// Simulated registration action
+// Registration action
 export async function handleRegister(values: any) {
-    console.log("Simulating registration with:", values);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // In a real app, you would use Firebase Auth to create a user.
-    // e.g., createUserWithEmailAndPassword(auth, values.email, values.password);
-    return { success: true, user: { id: "123", email: values.email, name: values.name } };
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+        const user = userCredential.user;
+        return { success: true, user: { id: user.uid, email: user.email, name: values.name } };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
 }
 
-// Simulated login action
+// Login action
 export async function handleLogin(values: any) {
-    console.log("Simulating login with:", values);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-     // In a real app, you would use Firebase Auth to sign in.
-    // e.g., signInWithEmailAndPassword(auth, values.email, values.password);
-    return { success: true, user: { id: "123", email: values.email, name: "Team Captain" } };
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+        const user = userCredential.user;
+        return { success: true, user: { id: user.uid, email: user.email, name: "Team Captain" } };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
 }
